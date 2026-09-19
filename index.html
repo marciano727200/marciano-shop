@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARCIANO.SHOP - Plataforma</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandBlack: '#000000',
+                        brandDarkCard: '#080808',
+                        brandDarkBorder: '#2b0000',
+                        brandRed: '#8b0000',
+                        brandRedBright: '#ff0033',
+                        brandGreen: '#00ff66',
+                        brandGreenDark: '#00cc52',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'glow-red': '0 0 15px rgba(139, 0, 0, 0.6)',
+                        'glow-red-lg': '0 0 25px rgba(255, 0, 51, 0.7)',
+                        'glow-green': '0 0 10px rgba(0, 255, 102, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #000000;
+            color: #00ff66;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Scrollbar styles */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #8b0000;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff0033;
+        }
+
+        /* Form elements forced green on black */
+        input, select, textarea {
+            color: #00ff66 !important;
+            background-color: #080808 !important;
+        }
+        input::placeholder, textarea::placeholder {
+            color: #00a843 !important;
+            opacity: 0.6;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        #snakeCanvas {
+            background-color: #050505;
+            border: 2px solid #8b0000;
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-black text-brandGreen flex flex-col justify-between selection:bg-brandRed selection:text-white">
+
+    <header class="w-full max-w-lg mx-auto p-4 flex justify-between items-center relative z-20">
+        <!-- Logo / Title Header -->
+        <div class="flex items-center space-x-2 cursor-pointer" onclick="switchMainTab('reportes')">
+            <div class="w-9 h-9 rounded-full border-2 border-brandRed bg-black flex items-center justify-center text-brandGreen font-bold text-sm shadow-glow-red">
+                👽
+            </div>
+            <span class="font-extrabold tracking-wider text-brandGreen text-lg">MARCIANO.SHOP</span>
+        </div>
+
+        <!-- Top Right Action Controls -->
+        <div class="flex items-center space-x-3">
+            <!-- Auth Badge Status -->
+            <div id="auth-status-pill" class="hidden text-[10px] px-2.5 py-1 rounded-full border border-brandRed bg-black text-brandGreen font-medium shadow-glow-red">
+                <span class="w-2 h-2 rounded-full bg-brandGreen inline-block mr-1.5 animate-pulse"></span>
+                <span id="header-username">USUARIO</span>
+            </div>
+
+            <!-- Menu Button -->
+            <div class="relative">
+                <button id="menu-btn" onclick="toggleDropdownMenu()" class="w-10 h-10 rounded-xl bg-brandRed flex items-center justify-center text-black font-bold shadow-glow-red hover:bg-brandRedBright transition">
+                    <i class="fa-solid fa-ellipsis-vertical text-xl"></i>
+                </button>
+
+                <!-- Dropdown Menu -->
+                <div id="dropdown-menu" class="hidden absolute right-0 mt-2 w-60 bg-black border-2 border-brandRed rounded-xl shadow-glow-red-lg py-2 z-50">
+                    <a href="#" onclick="showToast('Tema Rojo Neón Activo'); toggleDropdownMenu();" class="flex items-center px-4 py-3 hover:bg-brandRed/30 text-brandGreen text-xs font-semibold transition gap-3">
+                        <span class="text-base">☀️</span> Cambiar tema
+                    </a>
+                    <a href="#" onclick="showToast('Notificaciones activadas'); toggleDropdownMenu();" class="flex items-center px-4 py-3 hover:bg-brandRed/20 text-brandGreen text-xs font-semibold transition gap-3">
+                        <span class="text-base">🔔</span> Activar notificaciones
+                    </a>
+                    <a href="#" onclick="openSubView('juegos'); toggleDropdownMenu();" class="flex items-center px-4 py-3 hover:bg-brandRed/30 text-brandGreen text-xs font-semibold transition gap-3">
+                        <span class="text-base">🎮</span> Jugar
+                    </a>
+                    <a href="#" onclick="openSubView('peliculas'); toggleDropdownMenu();" class="flex items-center px-4 py-3 hover:bg-brandRed/30 text-brandGreen text-xs font-semibold transition gap-3">
+                        <span class="text-base">🎬</span> PELÍCULAS & +
+                    </a>
+                    <a href="#" onclick="showToast('Cuenta de USUARIO activa'); toggleDropdownMenu();" class="flex items-center px-4 py-3 hover:bg-brandRed/30 text-brandGreen text-xs font-semibold transition gap-3">
+                        <span class="text-base">👤</span> Mi cuenta
+                    </a>
+                    <hr class="border-brandRed/40 my-1">
+                    <div id="menu-auth-actions">
+                        <!-- Login/Logout controls -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-lg mx-auto px-4 pb-12 flex flex-col justify-start">
+
+        <!-- ================= VIEW 1: AUTHENTICATION ================= -->
+        <section id="auth-view" class="w-full flex flex-col items-center">
+            
+            <div class="relative mb-3 mt-2">
+                <div class="w-28 h-28 rounded-full border-4 border-brandRed bg-black p-1 shadow-glow-red-lg flex items-center justify-center relative overflow-hidden">
+                    <div class="w-full h-full rounded-full bg-gradient-to-b from-brandRed/40 to-black flex items-center justify-center">
+                        <svg class="w-20 h-20 text-brandRedBright" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10C22 6.48 17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-4.41 3.59-8 8-8s8 3.59 8 8c0 4.41-3.59 8-8 8zm-3.5-9c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm7 0c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-3.5 5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <h1 class="text-2xl font-black tracking-tight text-brandGreen mb-1">MARCIANO.SHOP</h1>
+            <p class="text-xs text-brandGreen/80 mb-5 font-medium italic">Seguimiento de tus reportes</p>
+
+            <button onclick="showToast('Abriendo bot de WhatsApp...')" class="w-full mb-6 py-2.5 px-4 rounded-full bg-brandRed/20 border border-brandRed text-brandGreen text-xs font-semibold hover:bg-brandRed/40 transition shadow-glow-red flex items-center justify-center gap-2">
+                <span>🚀</span> ¿Tu propio panel o bot de WhatsApp?
+            </button>
+
+            <!-- Auth Tabs -->
+            <div class="w-full bg-brandDarkCard border-b border-brandRed/50 flex mb-6 rounded-t-xl overflow-hidden">
+                <button id="tab-login" onclick="setAuthTab('login')" class="flex-1 py-3 text-center font-bold text-sm text-brandGreen border-b-2 border-brandRed shadow-glow-red transition">
+                    Iniciar sesión
+                </button>
+                <button id="tab-register" onclick="setAuthTab('register')" class="flex-1 py-3 text-center font-bold text-sm text-brandGreen/60 border-b-2 border-transparent hover:text-brandGreen transition">
+                    Registrarse
+                </button>
+            </div>
+
+            <div class="w-full">
+                <!-- LOGIN -->
+                <form id="login-form" onsubmit="handleLoginSubmit(event)" class="w-full space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-brandGreen mb-1.5">Correo electrónico</label>
+                        <div class="relative rounded-xl border border-brandRed/60 bg-black focus-within:border-brandRed shadow-inner">
+                            <input id="login-email" type="email" required placeholder="correo@ejemplo.com" class="w-full px-4 py-3 rounded-xl focus:outline-none text-sm font-medium">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-brandGreen mb-1.5">Contraseña</label>
+                        <div class="relative rounded-xl border border-brandRed/60 bg-black focus-within:border-brandRed shadow-inner flex items-center">
+                            <input id="login-password" type="password" required placeholder="••••••••" class="w-full px-4 py-3 rounded-xl focus:outline-none text-sm font-medium pr-10">
+                            <button type="button" onclick="togglePasswordVisibility('login-password', 'login-eye-icon')" class="absolute right-3 text-brandGreen/70 hover:text-brandGreen">
+                                <i id="login-eye-icon" class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 mt-2 rounded-xl bg-brandRed hover:bg-brandRedBright text-black font-extrabold text-sm shadow-glow-red transition active:scale-95">
+                        Iniciar sesión
+                    </button>
+                </form>
+
+                <!-- REGISTER -->
+                <form id="register-form" onsubmit="handleRegisterSubmit(event)" class="w-full space-y-4 hidden">
+                    <div>
+                        <label class="block text-xs font-semibold text-brandGreen mb-1.5">Nombre de usuario</label>
+                        <div class="relative rounded-xl border border-brandRed/60 bg-black focus-within:border-brandRed shadow-inner">
+                            <input id="register-name" type="text" required placeholder="Ej: USUARIO" class="w-full px-4 py-3 rounded-xl focus:outline-none text-sm font-medium">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-brandGreen mb-1.5">Correo electrónico</label>
+                        <div class="relative rounded-xl border border-brandRed/60 bg-black focus-within:border-brandRed shadow-inner">
+                            <input id="register-email" type="email" required placeholder="correo@ejemplo.com" class="w-full px-4 py-3 rounded-xl focus:outline-none text-sm font-medium">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-brandGreen mb-1.5">Contraseña</label>
+                        <div class="relative rounded-xl border border-brandRed/60 bg-black focus-within:border-brandRed shadow-inner flex items-center">
+                            <input id="register-password" type="password" required minlength="3" placeholder="••••••••" class="w-full px-4 py-3 rounded-xl focus:outline-none text-sm font-medium pr-10">
+                            <button type="button" onclick="togglePasswordVisibility('register-password', 'register-eye-icon')" class="absolute right-3 text-brandGreen/70 hover:text-brandGreen">
+                                <i id="register-eye-icon" class="fa-regular fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 mt-2 rounded-xl bg-brandRed hover:bg-brandRedBright text-black font-extrabold text-sm shadow-glow-red transition active:scale-95">
+                        Crear Cuenta Gratis
+                    </button>
+                </form>
+            </div>
+
+            <div class="w-full flex items-center my-6">
+                <div class="flex-grow border-t border-brandRed/40"></div>
+                <span class="px-3 text-xs text-brandGreen/60">o</span>
+                <div class="flex-grow border-t border-brandRed/40"></div>
+            </div>
+
+            <button onclick="handleQuickGoogleAuth()" class="w-full py-3 px-4 rounded-xl border border-brandRed/60 bg-black hover:bg-brandRed/20 text-brandGreen font-semibold text-sm transition flex items-center justify-center gap-3 shadow-glow-red">
+                <span class="bg-white rounded-full p-1 w-6 h-6 flex items-center justify-center">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+                    </svg>
+                </span>
+                Continuar con Google
+            </button>
+
+            <p id="auth-switch-text" class="mt-6 text-xs text-brandGreen/80">
+                ¿No tienes cuenta? 
+                <button onclick="setAuthTab('register')" class="text-brandGreen font-bold underline ml-1">
+                    Regístrate gratis
+                </button>
+            </p>
+        </section>
+
+
+        <!-- ================= VIEW 2: MAIN DASHBOARD ================= -->
+        <section id="dashboard-view" class="w-full hidden flex-col items-center">
+            
+            <div class="relative mb-2 mt-1 flex flex-col items-center">
+                <div class="w-20 h-20 rounded-full border-2 border-brandRed bg-black p-1 shadow-glow-red flex items-center justify-center relative overflow-hidden">
+                    <div class="w-full h-full rounded-full bg-gradient-to-b from-brandRed/50 to-black flex items-center justify-center">
+                        <svg class="w-14 h-14 text-brandRedBright" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12c0 5.52 4.48 10 10 10s10-4.48 10-10C22 6.48 17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8 0-4.41 3.59-8 8-8s8 3.59 8 8c0 4.41-3.59 8-8 8zm-3.5-9c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm7 0c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-3.5 5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+                        </svg>
+                    </div>
+                </div>
+                <h2 class="text-xl font-bold text-brandGreen mt-2">MARCIANO.SHOP</h2>
+                
+                <button onclick="showToast('¡Gracias por opinar!')" class="mt-1 px-3 py-1 rounded-full border border-brandRed bg-black text-brandGreen text-xs font-semibold shadow-glow-red hover:bg-brandRed/20 transition flex items-center gap-1.5">
+                    <span>⭐</span> Sé el primero en opinar
+                </button>
+            </div>
+
+            <!-- Dashboard Subnav -->
+            <div class="w-full bg-brandDarkCard border border-brandRed/50 rounded-xl p-1.5 my-4 flex items-center justify-between text-xs font-semibold shadow-glow-red">
+                <button id="nav-btn-reportes" onclick="switchMainTab('reportes')" class="flex-1 py-2 rounded-lg bg-black border border-brandRed text-brandGreen shadow-inner flex items-center justify-center gap-1.5 transition">
+                    📋 Reportes
+                </button>
+                <button id="nav-btn-chat" onclick="switchMainTab('chat')" class="flex-1 py-2 rounded-lg text-brandGreen/80 hover:text-brandGreen flex items-center justify-center gap-1.5 transition relative">
+                    💬 Chat <span class="w-2 h-2 rounded-full bg-brandRed absolute top-1 right-3"></span>
+                </button>
+                <button onclick="openNewReportModal()" class="px-3 py-2 rounded-lg bg-brandRed text-black font-extrabold hover:bg-brandRedBright transition flex items-center justify-center gap-1 shadow-glow-red">
+                    ➕ Nuevo
+                </button>
+                <button onclick="logoutUser()" class="px-3 py-2 rounded-lg text-brandGreen/80 hover:text-brandGreen flex items-center justify-center gap-1">
+                    🚪 Salir
+                </button>
+            </div>
+
+            <!-- User Greeting Header -->
+            <div class="w-full text-left mb-4 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-brandGreen">Hola, <span id="user-display-name">USUARIO</span> 🖐</h3>
+                <span id="user-display-email" class="text-[10px] text-brandGreen/60 border border-brandRed/40 px-2 py-0.5 rounded-full"></span>
+            </div>
+
+            <!-- CONTENT TAB 1: USER INDEPENDENT REPORTES -->
+            <div id="tab-content-reportes" class="w-full">
+                <div class="w-full grid grid-cols-2 gap-3 mb-6">
+                    <div class="bg-brandDarkCard border border-brandRed/50 rounded-2xl p-4 flex flex-col justify-between shadow-glow-red">
+                        <div class="text-2xl mb-1">📋</div>
+                        <div>
+                            <div id="stat-total" class="text-2xl font-black text-brandGreen">0</div>
+                            <div class="text-xs text-brandGreen/70 font-medium">Total</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brandDarkCard border border-brandRed/50 rounded-2xl p-4 flex flex-col justify-between shadow-glow-red">
+                        <div class="text-2xl mb-1">⏱️</div>
+                        <div>
+                            <div id="stat-pending" class="text-2xl font-black text-brandGreen">0</div>
+                            <div class="text-xs text-brandGreen/70 font-medium">Pendientes</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brandDarkCard border border-brandRed/50 rounded-2xl p-4 flex flex-col justify-between shadow-glow-red">
+                        <div class="text-2xl mb-1">⚡</div>
+                        <div>
+                            <div id="stat-process" class="text-2xl font-black text-brandGreen">0</div>
+                            <div class="text-xs text-brandGreen/70 font-medium">En proceso</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-brandDarkCard border border-brandRed/50 rounded-2xl p-4 flex flex-col justify-between shadow-glow-red">
+                        <div class="text-2xl mb-1">✅</div>
+                        <div>
+                            <div id="stat-resolved" class="text-2xl font-black text-brandGreen">0</div>
+                            <div class="text-xs text-brandGreen/70 font-medium">Resueltos</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="w-full text-left mb-3">
+                    <h3 class="text-base font-bold text-brandGreen">Mis reportes</h3>
+                </div>
+
+                <div class="w-full relative mb-3">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-brandGreen/70">🔍</span>
+                    <input id="search-input" type="text" oninput="filterReports()" placeholder="Buscar por correo, plataforma o descripción..." class="w-full pl-10 pr-4 py-3 rounded-xl bg-black border border-brandRed/50 text-xs focus:outline-none focus:border-brandRed shadow-inner">
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="w-full flex items-center space-x-1 overflow-x-auto pb-2 mb-4 text-xs font-semibold no-scrollbar">
+                    <button onclick="setFilter('all')" id="filter-all" class="px-3 py-1.5 rounded-lg bg-brandRed text-black font-extrabold shadow-glow-red whitespace-nowrap">
+                        Todos
+                    </button>
+                    <button onclick="setFilter('pending')" id="filter-pending" class="px-3 py-1.5 rounded-lg border border-brandRed/40 bg-black text-brandGreen whitespace-nowrap hover:bg-brandRed/20">
+                        ⏱️ Pendientes
+                    </button>
+                    <button onclick="setFilter('process')" id="filter-process" class="px-3 py-1.5 rounded-lg border border-brandRed/40 bg-black text-brandGreen whitespace-nowrap hover:bg-brandRed/20">
+                        ⚡ En proceso
+                    </button>
+                    <button onclick="setFilter('resolved')" id="filter-resolved" class="px-3 py-1.5 rounded-lg border border-brandRed/40 bg-black text-brandGreen whitespace-nowrap hover:bg-brandRed/20">
+                        ✅ Resueltos
+                    </button>
+                </div>
+
+                <!-- Container for Isolated Reports -->
+                <div id="reports-list" class="w-full space-y-3">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- CONTENT TAB 2: PUBLIC CHAT -->
+            <div id="tab-content-chat" class="w-full hidden flex-col">
+                <div class="w-full bg-brandDarkCard border-2 border-brandRed rounded-2xl p-4 shadow-glow-red flex flex-col h-[460px]">
+                    
+                    <div class="flex items-center justify-between border-b border-brandRed/40 pb-3 mb-3">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-brandGreen animate-pulse"></span>
+                            <div>
+                                <h4 class="text-sm font-extrabold text-brandGreen">Chat Público Marciano</h4>
+                                <p class="text-[10px] text-brandGreen/60">En vivo para usuarios registrados</p>
+                            </div>
+                        </div>
+                        <button onclick="clearChatHistory()" title="Limpiar chat local" class="text-xs text-brandRedBright hover:text-brandRed px-2 py-1 rounded border border-brandRed/30">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+
+                    <div id="chat-messages-container" class="flex-grow overflow-y-auto space-y-3 pr-1 text-xs mb-3">
+                        <!-- Dynamic Chat messages -->
+                    </div>
+
+                    <form onsubmit="handleSendChatMessage(event)" class="mt-auto flex items-center gap-2 border-t border-brandRed/40 pt-3">
+                        <input id="chat-message-input" type="text" required placeholder="Escribe un mensaje al grupo..." class="flex-grow px-3 py-2.5 rounded-xl border border-brandRed/50 bg-black text-xs focus:outline-none focus:border-brandRed">
+                        <button type="submit" class="px-4 py-2.5 rounded-xl bg-brandRed hover:bg-brandRedBright text-black font-extrabold text-xs shadow-glow-red transition">
+                            <i class="fa-solid fa-paper-plane text-sm"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ================= VIEW 3: SUB-PAGE JUEGOS ================= -->
+        <section id="juegos-view" class="w-full hidden flex-col items-center">
+            <div class="w-full flex items-center justify-between mb-4">
+                <button onclick="closeSubView()" class="px-3 py-1.5 rounded-xl border border-brandRed bg-black text-brandGreen text-xs font-bold hover:bg-brandRed/30 transition flex items-center gap-1 shadow-glow-red">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </button>
+                <h3 class="text-lg font-black text-brandGreen">🎮 ZONA DE JUEGOS</h3>
+                <div class="w-16"></div>
+            </div>
+
+            <div class="w-full bg-brandDarkCard border-2 border-brandRed rounded-2xl p-4 shadow-glow-red flex flex-col items-center text-center">
+                <span class="text-xs font-extrabold text-brandGreen mb-2">🐍 MARCIANO SNAKE NEÓN</span>
+                
+                <canvas id="snakeCanvas" width="280" height="280" class="rounded-xl my-2"></canvas>
+                
+                <div class="flex items-center justify-between w-full text-xs font-bold my-2 px-2">
+                    <span id="snakeScore">Puntos: 0</span>
+                    <span id="snakeHighScore">Récord: 0</span>
+                </div>
+
+                <!-- Mobile Controls for Snake -->
+                <div class="grid grid-cols-3 gap-2 w-48 my-3">
+                    <div></div>
+                    <button onclick="changeSnakeDir('UP')" class="py-2.5 bg-brandRed rounded-xl text-black font-black text-sm active:scale-90 shadow-glow-red">▲</button>
+                    <div></div>
+                    <button onclick="changeSnakeDir('LEFT')" class="py-2.5 bg-brandRed rounded-xl text-black font-black text-sm active:scale-90 shadow-glow-red">◄</button>
+                    <button onclick="startSnakeGame()" class="py-2.5 bg-brandGreen text-black font-black text-xs rounded-xl active:scale-90 shadow-glow-green">▶ JUGAR</button>
+                    <button onclick="changeSnakeDir('RIGHT')" class="py-2.5 bg-brandRed rounded-xl text-black font-black text-sm active:scale-90 shadow-glow-red">►</button>
+                    <div></div>
+                    <button onclick="changeSnakeDir('DOWN')" class="py-2.5 bg-brandRed rounded-xl text-black font-black text-sm active:scale-90 shadow-glow-red">▼</button>
+                    <div></div>
+                </div>
+                <p class="text-[10px] text-brandGreen/60">Usa los botones en pantalla o las flechas del teclado.</p>
+            </div>
+        </section>
+
+
+        <!-- ================= VIEW 4: SUB-PAGE PELÍCULAS & + ================= -->
+        <section id="peliculas-view" class="w-full hidden flex-col items-center">
+            <div class="w-full flex items-center justify-between mb-3">
+                <button onclick="closeSubView()" class="px-3 py-1.5 rounded-xl border border-brandRed bg-black text-brandGreen text-xs font-bold hover:bg-brandRed/30 transition flex items-center gap-1 shadow-glow-red">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </button>
+                <h3 class="text-base font-black text-brandGreen tracking-wide">🎬 PELÍCULAS & +</h3>
+                <div class="w-12"></div>
+            </div>
+
+            <!-- Streaming Services Quick Bar -->
+            <div class="w-full mb-4 bg-brandDarkCard border border-brandRed/60 rounded-2xl p-3 shadow-glow-red">
+                <p class="text-[11px] font-extrabold text-brandGreen mb-2 text-center uppercase tracking-wider">Cuentas Premium de Streaming</p>
+                <div class="grid grid-cols-4 gap-1.5 text-center text-[10px]">
+                    <button onclick="quickOrderStream('Netflix')" class="bg-black border border-brandRed/50 rounded-xl p-1.5 hover:bg-brandRed/30">
+                        <div class="text-red-500 font-black text-sm">N</div>
+                        <span>Netflix</span>
+                    </button>
+                    <button onclick="quickOrderStream('Disney+')" class="bg-black border border-brandRed/50 rounded-xl p-1.5 hover:bg-brandRed/30">
+                        <div class="text-blue-400 font-black text-sm">D+</div>
+                        <span>Disney+</span>
+                    </button>
+                    <button onclick="quickOrderStream('Max')" class="bg-black border border-brandRed/50 rounded-xl p-1.5 hover:bg-brandRed/30">
+                        <div class="text-purple-400 font-black text-sm">MAX</div>
+                        <span>HBO Max</span>
+                    </button>
+                    <button onclick="quickOrderStream('Spotify')" class="bg-black border border-brandRed/50 rounded-xl p-1.5 hover:bg-brandRed/30">
+                        <div class="text-emerald-400 font-black text-sm">🎵</div>
+                        <span>Spotify</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Search and Filter for 90 Movie Cards -->
+            <div class="w-full mb-3 space-y-2">
+                <div class="relative w-full">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-brandGreen/60 text-xs">🔍</span>
+                    <input id="movie-search-input" type="text" oninput="renderMovieGrid()" placeholder="Buscar en catálogo de 90 películas..." class="w-full pl-9 pr-3 py-2 rounded-xl bg-black border border-brandRed/60 text-xs focus:outline-none focus:border-brandRed shadow-inner">
+                </div>
+                
+                <div class="flex items-center space-x-1.5 overflow-x-auto pb-1 text-[11px] no-scrollbar">
+                    <button onclick="filterMovieGenre('all')" id="movie-cat-all" class="px-2.5 py-1 rounded-lg bg-brandRed text-black font-extrabold shadow-glow-red whitespace-nowrap">Todas (90)</button>
+                    <button onclick="filterMovieGenre('accion')" id="movie-cat-accion" class="px-2.5 py-1 rounded-lg border border-brandRed/50 bg-black text-brandGreen whitespace-nowrap">Acción</button>
+                    <button onclick="filterMovieGenre('sci-fi')" id="movie-cat-sci-fi" class="px-2.5 py-1 rounded-lg border border-brandRed/50 bg-black text-brandGreen whitespace-nowrap">Sci-Fi</button>
+                    <button onclick="filterMovieGenre('terror')" id="movie-cat-terror" class="px-2.5 py-1 rounded-lg border border-brandRed/50 bg-black text-brandGreen whitespace-nowrap">Terror</button>
+                    <button onclick="filterMovieGenre('animacion')" id="movie-cat-animacion" class="px-2.5 py-1 rounded-lg border border-brandRed/50 bg-black text-brandGreen whitespace-nowrap">Animación</button>
+                </div>
+            </div>
+
+            <!-- Subpage Gallery Layout: Exactly 3 Columns horizontal, displaying numbered movie cards with img tags -->
+            <div id="movies-grid-container" class="w-full grid grid-cols-3 gap-2.5">
+                <!-- Dynamically Generated via JS -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Modal: Play Movie / Streaming Link -->
+    <div id="movie-player-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4 z-50">
+        <div class="w-full max-w-sm bg-black border-2 border-brandRed rounded-2xl p-5 shadow-glow-red-lg relative flex flex-col items-center text-center">
+            <button onclick="closeMoviePlayerModal()" class="absolute top-3 right-3 text-brandGreen hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            
+            <span id="player-modal-number" class="text-xs font-black bg-brandRed text-black px-2 py-0.5 rounded-md mb-2">#1</span>
+            <h3 id="player-modal-title" class="text-base font-extrabold text-brandGreen mb-1">Título Película</h3>
+            <span id="player-modal-genre" class="text-[10px] text-brandGreen/60 uppercase border border-brandRed/40 px-2 py-0.5 rounded-full mb-3">Género</span>
+            
+            <div class="w-full h-44 rounded-xl border border-brandRed overflow-hidden mb-4 relative bg-black flex items-center justify-center">
+                <img id="player-modal-img" src="" alt="Movie" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div class="w-12 h-12 rounded-full bg-brandRed/90 text-black flex items-center justify-center shadow-glow-red animate-pulse cursor-pointer" onclick="triggerPlayMovie()">
+                        <i class="fa-solid fa-play text-xl ml-1"></i>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-xs text-brandGreen/80 mb-4">Haz clic para reproducir o transmitir este título en línea.</p>
+
+            <div class="w-full flex gap-2">
+                <button onclick="triggerPlayMovie()" class="flex-1 py-2.5 rounded-xl bg-brandRed hover:bg-brandRedBright text-black font-extrabold text-xs shadow-glow-red transition flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-circle-play"></i> Reproducir Película
+                </button>
+                <button onclick="quickOrderStream(document.getElementById('player-modal-title').innerText)" class="px-3 py-2.5 rounded-xl border border-brandRed bg-black text-brandGreen font-bold text-xs hover:bg-brandRed/20 transition">
+                    <i class="fa-solid fa-cart-plus"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: New Report -->
+    <div id="new-report-modal" class="fixed inset-0 bg-black/90 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="w-full max-w-md bg-black border-2 border-brandRed rounded-2xl p-6 shadow-glow-red-lg relative">
+            <button onclick="closeNewReportModal()" class="absolute top-4 right-4 text-brandGreen hover:text-white">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+            <h3 class="text-lg font-bold text-brandGreen mb-4 flex items-center gap-2">
+                <span>⚡</span> Crear Nuevo Reporte
+            </h3>
+            
+            <form onsubmit="handleCreateReport(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-brandGreen mb-1">Plataforma / Servicio</label>
+                    <input id="report-platform" type="text" required placeholder="Ej: Netflix, Disney+, Bot WhatsApp" class="w-full px-3 py-2.5 rounded-xl border border-brandRed/60 bg-black text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-brandGreen mb-1">Correo de la cuenta afectada</label>
+                    <input id="report-email" type="email" required placeholder="cliente@correo.com" class="w-full px-3 py-2.5 rounded-xl border border-brandRed/60 bg-black text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-brandGreen mb-1">Descripción del problema</label>
+                    <textarea id="report-desc" required rows="3" placeholder="Describe brevemente el inconveniente..." class="w-full px-3 py-2.5 rounded-xl border border-brandRed/60 bg-black text-sm"></textarea>
+                </div>
+                
+                <button type="submit" class="w-full py-3 rounded-xl bg-brandRed hover:bg-brandRedBright text-black font-extrabold text-sm shadow-glow-red transition">
+                    Enviar Reporte
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Component -->
+    <div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-black border-2 border-brandRed text-brandGreen px-4 py-2.5 rounded-full text-xs font-bold shadow-glow-red opacity-0 transition-opacity duration-300 pointer-events-none z-50 flex items-center gap-2">
+        <span id="toast-message">Notificación</span>
+    </div>
+
+    <script>
+        // Default users database
+        const DEFAULT_USERS = [
+            { name: "USUARIO", email: "usuario@ejemplo.com", password: "123" },
+            { name: "Soporte Marciano", email: "soporte@marciano.shop", password: "admin" }
+        ];
+
+        // Demo reports
+        const DEFAULT_REPORTS = [
+            {
+                id: 'REP-1001',
+                userEmail: 'usuario@ejemplo.com',
+                platform: 'Netflix Ultra HD',
+                email: 'cuenta.demo@gmail.com',
+                description: 'La pantalla solicita actualización de hogar',
+                status: 'pending',
+                date: '19/09/2026'
+            },
+            {
+                id: 'REP-1002',
+                userEmail: 'usuario@ejemplo.com',
+                platform: 'Bot WhatsApp Auto',
+                email: 'soporte.tienda@empresa.com',
+                description: 'Reconexión de sesión de WhatsApp solicitada',
+                status: 'process',
+                date: '18/09/2026'
+            }
+        ];
+
+        const DEFAULT_CHAT = [
+            {
+                id: 'msg-1',
+                userName: 'Soporte Marciano',
+                userEmail: 'soporte@marciano.shop',
+                text: '¡Bienvenidos al chat público de MARCIANO.SHOP! 👽',
+                time: '10:00 AM'
+            },
+            {
+                id: 'msg-2',
+                userName: 'USUARIO',
+                userEmail: 'usuario@ejemplo.com',
+                text: '¡Hola! Reporte en proceso enviado con éxito.',
+                time: '10:15 AM'
+            }
+        ];
+
+        // Movie Poster Themes and Title Generators for 90 numbered catalog items
+        const GENRES = ['accion', 'sci-fi', 'terror', 'animacion'];
+        const MOVIE_TITLES = [
+            "Marciano Invasión", "Neón Cyberpunk", "Galaxia Roja", "Alien Supremo", "Código Hacker",
+            "Noche Estelar", "Planeta X", "Órbita Final", "Trono Cósmico", "Agujero Negro",
+            "Misión Marte", "Nave Fantasma", "Sombra Extraterrestre", "Horizonte Rojo", "Andrómeda",
+            "Viaje Intergaláctico", "Guerreros Láser", "Espacio Infinito", "Abismo Cósmico", "Eclipse Rojo",
+            "Resurrección Alien", "Universo Paralelo", "Impacto Estelar", "Destino Marte", "Matriz Neón",
+            "Estrella Polar", "Supernova 3000", "Luz Extraterrestre", "Simbionte Oscuro", "Ciber Espacio"
+        ];
+
+        // Generate exactly 90 movies for grid (3 columns horizontal, 30 rows vertical = 90 cards)
+        const MOVIES_DATABASE = [];
+        for (let i = 1; i <= 90; i++) {
+            const titleIndex = (i - 1) % MOVIE_TITLES.length;
+            const cycle = Math.floor((i - 1) / MOVIE_TITLES.length) + 1;
+            const genreIndex = (i - 1) % GENRES.length;
+            const genre = GENRES[genreIndex];
+            
+            // Generate clean vector poster image using svg placeholders
+            const posterColor = genre === 'accion' ? '8b0000' : (genre === 'sci-fi' ? '004488' : (genre === 'terror' ? '330033' : '006633'));
+            const posterUrl = `https://placehold.co/300x450/${posterColor}/00ff66?text=MARCIANO+${i}`;
+
+            MOVIES_DATABASE.push({
+                number: i,
+                id: `mov-${i}`,
+                title: `${MOVIE_TITLES[titleIndex]} ${cycle > 1 ? cycle : ''}`.trim(),
+                genre: genre,
+                image: posterUrl,
+                link: `https://www.youtube.com/results?search_query=trailer+pelicula+alien+marte+${i}`
+            });
+        }
+
+        let currentUser = null;
+        let usersData = [];
+        let reportsData = [];
+        let chatData = [];
+        let currentFilter = 'all';
+        let currentMovieGenre = 'all';
+        let selectedMovieForModal = null;
+
+        // Snake Game Variables
+        let snakeCanvas, snakeCtx;
+        let snake = [];
+        let food = {};
+        let snakeDir = 'RIGHT';
+        let snakeInterval = null;
+        let snakeScore = 0;
+        let snakeHighScore = 0;
+
+        window.onload = function() {
+            initLocalStorage();
+            checkSession();
+            initSnakeCanvas();
+            renderMovieGrid();
+        };
+
+        function initLocalStorage() {
+            if (!localStorage.getItem('marciano_users')) {
+                localStorage.setItem('marciano_users', JSON.stringify(DEFAULT_USERS));
+            }
+            if (!localStorage.getItem('marciano_reports')) {
+                localStorage.setItem('marciano_reports', JSON.stringify(DEFAULT_REPORTS));
+            }
+            if (!localStorage.getItem('marciano_chat')) {
+                localStorage.setItem('marciano_chat', JSON.stringify(DEFAULT_CHAT));
+            }
+
+            usersData = JSON.parse(localStorage.getItem('marciano_users'));
+            reportsData = JSON.parse(localStorage.getItem('marciano_reports'));
+            chatData = JSON.parse(localStorage.getItem('marciano_chat'));
+        }
+
+        function checkSession() {
+            const savedSession = localStorage.getItem('marciano_session');
+            if (savedSession) {
+                currentUser = JSON.parse(savedSession);
+                showDashboardView();
+            } else {
+                showAuthView();
+            }
+        }
+
+        function setAuthTab(tab) {
+            const loginTab = document.getElementById('tab-login');
+            const registerTab = document.getElementById('tab-register');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const switchText = document.getElementById('auth-switch-text');
+
+            if (tab === 'login') {
+                loginTab.className = "flex-1 py-3 text-center font-bold text-sm text-brandGreen border-b-2 border-brandRed shadow-glow-red transition";
+                registerTab.className = "flex-1 py-3 text-center font-bold text-sm text-brandGreen/60 border-b-2 border-transparent hover:text-brandGreen transition";
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                switchText.innerHTML = `¿No tienes cuenta? <button onclick="setAuthTab('register')" class="text-brandGreen font-bold underline ml-1">Regístrate gratis</button>`;
+            } else {
+                registerTab.className = "flex-1 py-3 text-center font-bold text-sm text-brandGreen border-b-2 border-brandRed shadow-glow-red transition";
+                loginTab.className = "flex-1 py-3 text-center font-bold text-sm text-brandGreen/60 border-b-2 border-transparent hover:text-brandGreen transition";
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                switchText.innerHTML = `¿Ya tienes cuenta? <button onclick="setAuthTab('login')" class="text-brandGreen font-bold underline ml-1">Inicia sesión aquí</button>`;
+            }
+        }
+
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim().toLowerCase();
+            const password = document.getElementById('login-password').value;
+
+            usersData = JSON.parse(localStorage.getItem('marciano_users')) || [];
+            const user = usersData.find(u => u.email.toLowerCase() === email && u.password === password);
+
+            if (user) {
+                currentUser = { name: user.name || "USUARIO", email: user.email };
+                localStorage.setItem('marciano_session', JSON.stringify(currentUser));
+                showToast(`¡Bienvenido, ${currentUser.name}!`);
+                showDashboardView();
+            } else {
+                showToast('❌ Correo o contraseña incorrectos');
+            }
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            let name = document.getElementById('register-name').value.trim();
+            if (!name) name = "USUARIO";
+
+            const email = document.getElementById('register-email').value.trim().toLowerCase();
+            const password = document.getElementById('register-password').value;
+
+            usersData = JSON.parse(localStorage.getItem('marciano_users')) || [];
+            const exists = usersData.some(u => u.email.toLowerCase() === email);
+
+            if (exists) {
+                showToast('⚠️ Este correo ya está registrado');
+                return;
+            }
+
+            const newUser = { name, email, password };
+            usersData.push(newUser);
+            localStorage.setItem('marciano_users', JSON.stringify(usersData));
+
+            currentUser = { name: newUser.name, email: newUser.email };
+            localStorage.setItem('marciano_session', JSON.stringify(currentUser));
+
+            showToast('🎉 ¡Registro completado!');
+            showDashboardView();
+        }
+
+        function handleQuickGoogleAuth() {
+            currentUser = { name: "USUARIO", email: "usuario.google@gmail.com" };
+            localStorage.setItem('marciano_session', JSON.stringify(currentUser));
+            showToast('Acceso correcto con Google');
+            showDashboardView();
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('marciano_session');
+            currentUser = null;
+            showToast('Sesión cerrada');
+            showAuthView();
+        }
+
+        function togglePasswordVisibility(inputId, iconId) {
+            const pwdInput = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                icon.className = 'fa-regular fa-eye-slash';
+            } else {
+                pwdInput.type = 'password';
+                icon.className = 'fa-regular fa-eye';
+            }
+        }
+
+        function showAuthView() {
+            document.getElementById('auth-view').classList.remove('hidden');
+            document.getElementById('auth-view').classList.add('flex');
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('flex');
+            document.getElementById('juegos-view').classList.add('hidden');
+            document.getElementById('peliculas-view').classList.add('hidden');
+            document.getElementById('auth-status-pill').classList.add('hidden');
+            updateDropdownMenuAuth();
+        }
+
+        function showDashboardView() {
+            document.getElementById('auth-view').classList.add('hidden');
+            document.getElementById('auth-view').classList.remove('flex');
+            document.getElementById('dashboard-view').classList.remove('hidden');
+            document.getElementById('dashboard-view').classList.add('flex');
+            document.getElementById('juegos-view').classList.add('hidden');
+            document.getElementById('peliculas-view').classList.add('hidden');
+            
+            document.getElementById('auth-status-pill').classList.remove('hidden');
+            
+            const displayName = currentUser ? (currentUser.name || "USUARIO") : "USUARIO";
+            document.getElementById('header-username').innerText = displayName;
+            document.getElementById('user-display-name').innerText = displayName;
+            document.getElementById('user-display-email').innerText = currentUser ? currentUser.email : '';
+
+            updateDropdownMenuAuth();
+            switchMainTab('reportes');
+            renderUserReports();
+            renderChatMessages();
+        }
+
+        function openSubView(view) {
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('flex');
+            
+            if (view === 'juegos') {
+                document.getElementById('juegos-view').classList.remove('hidden');
+                document.getElementById('juegos-view').classList.add('flex');
+                document.getElementById('peliculas-view').classList.add('hidden');
+                startSnakeGame();
+            } else if (view === 'peliculas') {
+                document.getElementById('peliculas-view').classList.remove('hidden');
+                document.getElementById('peliculas-view').classList.add('flex');
+                document.getElementById('juegos-view').classList.add('hidden');
+                renderMovieGrid();
+            }
+        }
+
+        function closeSubView() {
+            if (snakeInterval) clearInterval(snakeInterval);
+            showDashboardView();
+        }
+
+        function updateDropdownMenuAuth() {
+            const menuContainer = document.getElementById('menu-auth-actions');
+            if (currentUser) {
+                menuContainer.innerHTML = `
+                    <a href="#" onclick="logoutUser(); toggleDropdownMenu();" class="flex items-center px-4 py-3 hover:bg-brandRed/20 text-brandRedBright text-xs font-semibold transition gap-3">
+                        <span class="text-base">🚪</span> Cerrar sesión (${currentUser.name})
+                    </a>
+                `;
+            } else {
+                menuContainer.innerHTML = `
+                    <a href="#" onclick="showAuthView(); toggleDropdownMenu();" class="flex items-center px-4 py-3 hover:bg-brandRed/20 text-brandGreen text-xs font-semibold transition gap-3">
+                        <span class="text-base">🔑</span> Iniciar sesión / Registro
+                    </a>
+                `;
+            }
+        }
+
+        function switchMainTab(tab) {
+            const btnReportes = document.getElementById('nav-btn-reportes');
+            const btnChat = document.getElementById('nav-btn-chat');
+            const contentReportes = document.getElementById('tab-content-reportes');
+            const contentChat = document.getElementById('tab-content-chat');
+
+            if (tab === 'reportes') {
+                btnReportes.className = "flex-1 py-2 rounded-lg bg-black border border-brandRed text-brandGreen shadow-inner flex items-center justify-center gap-1.5 transition";
+                btnChat.className = "flex-1 py-2 rounded-lg text-brandGreen/80 hover:text-brandGreen flex items-center justify-center gap-1.5 transition relative";
+                contentReportes.classList.remove('hidden');
+                contentChat.classList.add('hidden');
+                contentChat.classList.remove('flex');
+            } else {
+                btnChat.className = "flex-1 py-2 rounded-lg bg-black border border-brandRed text-brandGreen shadow-inner flex items-center justify-center gap-1.5 transition relative";
+                btnReportes.className = "flex-1 py-2 rounded-lg text-brandGreen/80 hover:text-brandGreen flex items-center justify-center gap-1.5 transition";
+                contentReportes.add('hidden');
+                contentChat.classList.remove('hidden');
+                contentChat.classList.add('flex');
+                renderChatMessages();
+            }
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            ['all', 'pending', 'process', 'resolved'].forEach(f => {
+                const btn = document.getElementById(`filter-${f}`);
+                if (f === filter) {
+                    btn.className = "px-3 py-1.5 rounded-lg bg-brandRed text-black font-extrabold shadow-glow-red whitespace-nowrap";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg border border-brandRed/40 bg-black text-brandGreen whitespace-nowrap hover:bg-brandRed/20";
+                }
+            });
+            renderUserReports();
+        }
+
+        function filterReports() {
+            renderUserReports();
+        }
+
+        function renderUserReports() {
+            reportsData = JSON.parse(localStorage.getItem('marciano_reports')) || [];
+            
+            const myUserReports = currentUser 
+                ? reportsData.filter(r => r.userEmail && r.userEmail.toLowerCase() === currentUser.email.toLowerCase())
+                : [];
+
+            const container = document.getElementById('reports-list');
+            const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase();
+
+            const total = myUserReports.length;
+            const pending = myUserReports.filter(r => r.status === 'pending').length;
+            const process = myUserReports.filter(r => r.status === 'process').length;
+            const resolved = myUserReports.filter(r => r.status === 'resolved').length;
+
+            document.getElementById('stat-total').innerText = total;
+            document.getElementById('stat-pending').innerText = pending;
+            document.getElementById('stat-process').innerText = process;
+            document.getElementById('stat-resolved').innerText = resolved;
+
+            let filtered = myUserReports.filter(r => {
+                if (currentFilter !== 'all' && r.status !== currentFilter) return false;
+                if (searchQuery) {
+                    return r.email.toLowerCase().includes(searchQuery) ||
+                           r.platform.toLowerCase().includes(searchQuery) ||
+                           r.description.toLowerCase().includes(searchQuery) ||
+                           r.id.toLowerCase().includes(searchQuery);
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="w-full py-8 text-center border border-brandRed/30 rounded-xl bg-black">
+                        <p class="text-xs text-brandGreen/60">No tienes reportes en esta categoría.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = filtered.map(r => {
+                let badge = '';
+                if (r.status === 'pending') {
+                    badge = `<span class="px-2 py-0.5 rounded-md bg-yellow-950 border border-yellow-600 text-yellow-400 text-[10px] font-bold">⏱️ Pendiente</span>`;
+                } else if (r.status === 'process') {
+                    badge = `<span class="px-2 py-0.5 rounded-md bg-brandRed/40 border border-brandRedBright text-brandGreen text-[10px] font-bold">⚡ En proceso</span>`;
+                } else {
+                    badge = `<span class="px-2 py-0.5 rounded-md bg-emerald-950 border border-emerald-500 text-emerald-400 text-[10px] font-bold">✅ Resuelto</span>`;
+                }
+
+                return `
+                    <div class="w-full bg-brandDarkCard border border-brandRed/50 rounded-xl p-3.5 shadow-glow-red hover:border-brandRed transition">
+                        <div class="flex items-center justify-between mb-1.5">
+                            <span class="text-xs font-black text-brandGreen tracking-wider">${r.platform}</span>
+                            ${badge}
+                        </div>
+                        <p class="text-xs font-medium text-brandGreen/90 mb-1">${r.description}</p>
+                        <div class="flex items-center justify-between text-[11px] text-brandGreen/60 pt-2 border-t border-brandRed/20 mt-2">
+                            <span>📧 ${r.email}</span>
+                            <span>📅 ${r.date}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filterMovieGenre(genre) {
+            currentMovieGenre = genre;
+            ['all', 'accion', 'sci-fi', 'terror', 'animacion'].forEach(g => {
+                const btn = document.getElementById(`movie-cat-${g}`);
+                if (btn) {
+                    if (g === genre) {
+                        btn.className = "px-2.5 py-1 rounded-lg bg-brandRed text-black font-extrabold shadow-glow-red whitespace-nowrap";
+                    } else {
+                        btn.className = "px-2.5 py-1 rounded-lg border border-brandRed/50 bg-black text-brandGreen whitespace-nowrap";
+                    }
+                }
+            });
+            renderMovieGrid();
+        }
+
+        function renderMovieGrid() {
+            const container = document.getElementById('movies-grid-container');
+            if (!container) return;
+
+            const searchQuery = (document.getElementById('movie-search-input')?.value || '').toLowerCase();
+
+            let list = MOVIES_DATABASE.filter(m => {
+                if (currentMovieGenre !== 'all' && m.genre !== currentMovieGenre) return false;
+                if (searchQuery) {
+                    return m.title.toLowerCase().includes(searchQuery) || m.number.toString().includes(searchQuery);
+                }
+                return true;
+            });
+
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-3 py-10 text-center border border-brandRed/40 rounded-xl bg-black">
+                        <p class="text-xs text-brandGreen/60">No se encontraron películas en la búsqueda.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = list.map(m => `
+                <div onclick="openMoviePlayerModal(${m.number})" class="group cursor-pointer bg-brandDarkCard border border-brandRed/60 hover:border-brandRedBright rounded-xl overflow-hidden shadow-glow-red flex flex-col justify-between transition hover:-translate-y-1 relative">
+                    
+                    <!-- Number Badge -->
+                    <div class="absolute top-1 left-1 bg-brandRed/90 text-black font-black text-[9px] px-1.5 py-0.5 rounded shadow-glow-red z-10 border border-brandRedBright">
+                        #${m.number}
+                    </div>
+
+                    <!-- Image HTML Poster -->
+                    <div class="w-full aspect-[2/3] bg-black relative overflow-hidden">
+                        <img src="${m.image}" alt="${m.title}" class="w-full h-full object-cover group-hover:scale-110 transition duration-300" loading="lazy">
+                        <div class="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition"></div>
+                        <div class="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-brandRed text-black flex items-center justify-center text-[10px] shadow-glow-red">
+                            <i class="fa-solid fa-play"></i>
+                        </div>
+                    </div>
+
+                    <!-- Title & Details -->
+                    <div class="p-1.5 text-center flex flex-col items-center">
+                        <h4 class="text-[10px] font-black text-brandGreen truncate w-full leading-tight mb-0.5">${m.title}</h4>
+                        <span class="text-[8px] text-brandGreen/60 uppercase tracking-tighter">${m.genre}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openMoviePlayerModal(movieNumber) {
+            const movie = MOVIES_DATABASE.find(m => m.number === movieNumber);
+            if (!movie) return;
+
+            selectedMovieForModal = movie;
+            document.getElementById('player-modal-number').innerText = `#${movie.number}`;
+            document.getElementById('player-modal-title').innerText = movie.title;
+            document.getElementById('player-modal-genre').innerText = `GÉNERO: ${movie.genre}`;
+            document.getElementById('player-modal-img').src = movie.image;
+
+            document.getElementById('movie-player-modal').classList.remove('hidden');
+            document.getElementById('movie-player-modal').classList.add('flex');
+        }
+
+        function closeMoviePlayerModal() {
+            document.getElementById('movie-player-modal').classList.remove('flex');
+            document.getElementById('movie-player-modal').classList.add('hidden');
+        }
+
+        function triggerPlayMovie() {
+            if (selectedMovieForModal) {
+                showToast(`🍿 Abriendo película #${selectedMovieForModal.number}: ${selectedMovieForModal.title}`);
+                window.open(selectedMovieForModal.link, '_blank');
+            }
+        }
+
+        function openNewReportModal() {
+            if (!currentUser) {
+                showToast('Debes iniciar sesión para crear un reporte');
+                showAuthView();
+                return;
+            }
+            document.getElementById('new-report-modal').classList.remove('hidden');
+            document.getElementById('new-report-modal').classList.add('flex');
+        }
+
+        function closeNewReportModal() {
+            document.getElementById('new-report-modal').classList.remove('flex');
+            document.getElementById('new-report-modal').classList.add('hidden');
+        }
+
+        function handleCreateReport(e) {
+            e.preventDefault();
+            const platform = document.getElementById('report-platform').value;
+            const email = document.getElementById('report-email').value;
+            const desc = document.getElementById('report-desc').value;
+
+            const newReport = {
+                id: `REP-${Math.floor(1000 + Math.random() * 9000)}`,
+                userEmail: currentUser.email,
+                platform: platform,
+                email: email,
+                description: desc,
+                status: 'pending',
+                date: new Date().toLocaleDateString('es-ES')
+            };
+
+            reportsData = JSON.parse(localStorage.getItem('marciano_reports')) || [];
+            reportsData.unshift(newReport);
+            localStorage.setItem('marciano_reports', JSON.stringify(reportsData));
+
+            closeNewReportModal();
+            showToast('¡Reporte registrado en tu cuenta!');
+            renderUserReports();
+
+            document.getElementById('report-platform').value = '';
+            document.getElementById('report-email').value = '';
+            document.getElementById('report-desc').value = '';
+        }
+
+        function quickOrderStream(platformName) {
+            if (!currentUser) {
+                showToast('Inicia sesión para realizar solicitudes');
+                showAuthView();
+                return;
+            }
+
+            const newReport = {
+                id: `REP-${Math.floor(1000 + Math.random() * 9000)}`,
+                userEmail: currentUser.email,
+                platform: platformName,
+                email: currentUser.email,
+                description: `Solicitud de activación para servicio ${platformName}`,
+                status: 'pending',
+                date: new Date().toLocaleDateString('es-ES')
+            };
+
+            reportsData = JSON.parse(localStorage.getItem('marciano_reports')) || [];
+            reportsData.unshift(newReport);
+            localStorage.setItem('marciano_reports', JSON.stringify(reportsData));
+
+            showToast(`¡Solicitud enviada para ${platformName}!`);
+            closeMoviePlayerModal();
+            closeSubView();
+        }
+
+        function renderChatMessages() {
+            chatData = JSON.parse(localStorage.getItem('marciano_chat')) || [];
+            const container = document.getElementById('chat-messages-container');
+
+            if (chatData.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex items-center justify-center text-center text-brandGreen/50 text-xs">
+                        Aún no hay mensajes en la sala.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = chatData.map(msg => {
+                const isMe = currentUser && currentUser.email === msg.userEmail;
+                
+                return `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'}">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="font-bold text-[11px] ${isMe ? 'text-brandRedBright' : 'text-brandGreen'}">${msg.userName}</span>
+                            <span class="text-[9px] text-brandGreen/50">${msg.time}</span>
+                        </div>
+                        <div class="max-w-[85%] px-3 py-2 rounded-xl text-xs font-medium border ${isMe ? 'bg-brandRed/30 border-brandRed text-brandGreen rounded-tr-none' : 'bg-black border-brandRed/40 text-brandGreen/90 rounded-tl-none'} shadow-glow-red">
+                            ${msg.text}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function handleSendChatMessage(e) {
+            e.preventDefault();
+            if (!currentUser) {
+                showToast('Debes iniciar sesión para chatear');
+                showAuthView();
+                return;
+            }
+
+            const input = document.getElementById('chat-message-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const newMsg = {
+                id: `msg-${Date.now()}`,
+                userName: currentUser.name || "USUARIO",
+                userEmail: currentUser.email,
+                text: text,
+                time: timeStr
+            };
+
+            chatData = JSON.parse(localStorage.getItem('marciano_chat')) || [];
+            chatData.push(newMsg);
+            localStorage.setItem('marciano_chat', JSON.stringify(chatData));
+
+            input.value = '';
+            renderChatMessages();
+        }
+
+        function clearChatHistory() {
+            if (confirm('¿Restablecer el chat público?')) {
+                localStorage.setItem('marciano_chat', JSON.stringify(DEFAULT_CHAT));
+                renderChatMessages();
+                showToast('Chat reajustado');
+            }
+        }
+
+        function initSnakeCanvas() {
+            snakeCanvas = document.getElementById('snakeCanvas');
+            if (snakeCanvas) {
+                snakeCtx = snakeCanvas.getContext('2d');
+            }
+        }
+
+        function startSnakeGame() {
+            if (snakeInterval) clearInterval(snakeInterval);
+            
+            snake = [
+                { x: 140, y: 140 },
+                { x: 120, y: 140 },
+                { x: 100, y: 140 }
+            ];
+            snakeDir = 'RIGHT';
+            snakeScore = 0;
+            document.getElementById('snakeScore').innerText = `Puntos: ${snakeScore}`;
+            spawnFood();
+            snakeInterval = setInterval(gameLoopSnake, 120);
+        }
+
+        function spawnFood() {
+            const grid = 20;
+            food = {
+                x: Math.floor(Math.random() * (snakeCanvas.width / grid)) * grid,
+                y: Math.floor(Math.random() * (snakeCanvas.height / grid)) * grid
+            };
+        }
+
+        function changeSnakeDir(dir) {
+            if (dir === 'LEFT' && snakeDir !== 'RIGHT') snakeDir = 'LEFT';
+            if (dir === 'UP' && snakeDir !== 'DOWN') snakeDir = 'UP';
+            if (dir === 'RIGHT' && snakeDir !== 'LEFT') snakeDir = 'RIGHT';
+            if (dir === 'DOWN' && snakeDir !== 'UP') snakeDir = 'DOWN';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowLeft') changeSnakeDir('LEFT');
+            if (e.key === 'ArrowUp') changeSnakeDir('UP');
+            if (e.key === 'ArrowRight') changeSnakeDir('RIGHT');
+            if (e.key === 'ArrowDown') changeSnakeDir('DOWN');
+        });
+
+        function gameLoopSnake() {
+            const grid = 20;
+            let headX = snake[0].x;
+            let headY = snake[0].y;
+
+            if (snakeDir === 'LEFT') headX -= grid;
+            if (snakeDir === 'UP') headY -= grid;
+            if (snakeDir === 'RIGHT') headX += grid;
+            if (snakeDir === 'DOWN') headY += grid;
+
+            if (headX < 0 || headX >= snakeCanvas.width || headY < 0 || headY >= snakeCanvas.height) {
+                gameOverSnake();
+                return;
+            }
+
+            for (let i = 0; i < snake.length; i++) {
+                if (snake[i].x === headX && snake[i].y === headY) {
+                    gameOverSnake();
+                    return;
+                }
+            }
+
+            const newHead = { x: headX, y: headY };
+
+            if (headX === food.x && headY === food.y) {
+                snakeScore += 10;
+                document.getElementById('snakeScore').innerText = `Puntos: ${snakeScore}`;
+                if (snakeScore > snakeHighScore) {
+                    snakeHighScore = snakeScore;
+                    document.getElementById('snakeHighScore').innerText = `Récord: ${snakeHighScore}`;
+                }
+                spawnFood();
+            } else {
+                snake.pop();
+            }
+
+            snake.unshift(newHead);
+
+            snakeCtx.fillStyle = '#050505';
+            snakeCtx.fillRect(0, 0, snakeCanvas.width, snakeCanvas.height);
+
+            snakeCtx.fillStyle = '#ff0033';
+            snakeCtx.shadowColor = '#ff0033';
+            snakeCtx.shadowBlur = 10;
+            snakeCtx.fillRect(food.x, food.y, grid - 2, grid - 2);
+
+            snakeCtx.shadowColor = '#00ff66';
+            snakeCtx.shadowBlur = 8;
+            for (let i = 0; i < snake.length; i++) {
+                snakeCtx.fillStyle = i === 0 ? '#00ff66' : '#00cc52';
+                snakeCtx.fillRect(snake[i].x, snake[i].y, grid - 2, grid - 2);
+            }
+            snakeCtx.shadowBlur = 0;
+        }
+
+        function gameOverSnake() {
+            clearInterval(snakeInterval);
+            showToast(`🎮 Fin del Juego. Puntos: ${snakeScore}`);
+        }
+
+        function toggleDropdownMenu() {
+            const menu = document.getElementById('dropdown-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        window.addEventListener('click', function(e) {
+            const menuBtn = document.getElementById('menu-btn');
+            const menu = document.getElementById('dropdown-menu');
+            if (menuBtn && !menuBtn.contains(e.target) && menu && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+            }
+        });
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-message');
+            toastMsg.innerText = message;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0');
+            }, 2800);
+        }
+    </script>
+</body>
+</html>
